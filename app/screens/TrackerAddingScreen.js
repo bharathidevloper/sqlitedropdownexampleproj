@@ -31,18 +31,7 @@ function TrackerAddingScreen(props) {
     let timeZoneJsonData = []
 
     useEffect(() => {
-
-
-
-
         createDatabase();
-
-        // if (isLoading === false) {
-        //     dropDownMethod({
-        //         userid: "rocheet@purple.com",
-        //         password: "Rocheet@321"
-        //     });
-        // }
 
     }, []);
 
@@ -50,10 +39,8 @@ function TrackerAddingScreen(props) {
         db.transaction(txn => {
             txn.executeSql("SELECT name FROM sqlite_master WHERE type='table' AND name='device_type'", [], (tx, result) => {
                 if (result.rows.length == 0) {
-                    //   txn.executeSql('DROP TABLE IF EXISTS device_type', []);
-
                     console.log("table is created");
-                    txn.executeSql("CREATE TABLE IF NOT EXISTS device_type(id INTEGER PRIMARY KEY AUTOINCREMENT, text VARCHAR(20),value INT(5))", []);
+                    txn.executeSql("CREATE TABLE IF NOT EXISTS device_type(id INTEGER PRIMARY KEY AUTOINCREMENT,type VARCHAR(20), text VARCHAR(20),value INT(5))", []);
                     dropDownMethod({
                         userid: "rocheet@purple.com",
                         password: "Rocheet@321"
@@ -62,7 +49,7 @@ function TrackerAddingScreen(props) {
                 else {
                     console.log("table is truncate");
 
-                    txn.executeSql("SELECT text,value FROM device_type", [], (tx, result) => {
+                    txn.executeSql("SELECT type,text,value FROM device_type", [], (tx, result) => {
                         if (result.rows.length == 0) {
                             dropDownMethod({
                                 userid: "rocheet@purple.com",
@@ -71,10 +58,39 @@ function TrackerAddingScreen(props) {
                         } else {
                             console.log(result.rows.item(0));
                             for (var i = 0; i < result.rows.length; i++) {
-                                deviceTypeJsonData.push({
-                                    value: result.rows.item(i).text,
-                                    text: result.rows.item(i).text
-                                });
+                                console.log(result.rows.item(i).type);
+
+                                if (result.rows.item(i).type == "device_types") {
+                                    deviceTypeJsonData.push({
+                                        value: result.rows.item(i).text,
+                                        text: result.rows.item(i).text
+                                    });
+                                }
+                                if (result.rows.item(i).type == "vehicle_types") {
+                                    vehicleTypeJsonData.push({
+                                        value: result.rows.item(i).text,
+                                        text: result.rows.item(i).text
+                                    });
+                                }
+                                if (result.rows.item(i).type == "timezones") {
+                                    timeZoneJsonData.push({
+                                        value: result.rows.item(i).text,
+                                        text: result.rows.item(i).text
+                                    });
+                                }
+                                if (result.rows.item(i).type == "pollint_interval") {
+                                    pollingIntervalJsonData.push({
+                                        value: result.rows.item(i).value,
+                                        text: result.rows.item(i).value
+                                    });
+                                }
+                                if (result.rows.item(i).type == "speed_limit") {
+                                    speedLimitJsonData.push({
+                                        value: result.rows.item(i).value,
+                                        text: result.rows.item(i).value
+                                    });
+                                }
+
                             }
                         }
                     });
@@ -271,7 +287,38 @@ function TrackerAddingScreen(props) {
 
             db.transaction(txn => {
                 for (var i = 0; i < dropDownResponse.device_types.length; i++) {
-                    txn.executeSql("INSERT INTO device_type(text,value) VALUES (?,?)", [dropDownResponse.device_types[i].text, dropDownResponse.device_types[i].value], (tx, result) => {
+                    txn.executeSql("INSERT INTO device_type(type,text,value) VALUES (?,?,?)", ["device_types", dropDownResponse.device_types[i].text, dropDownResponse.device_types[i].value], (tx, result) => {
+                        if (result.rowsAffected > 0) {
+                            console.log("result:" + result.rowsAffected);
+                        }
+                    })
+
+                }
+                for (var i = 0; i < dropDownResponse.vehicle_types.length; i++) {
+                    txn.executeSql("INSERT INTO device_type(type,text,value) VALUES (?,?,?)", ["vehicle_types", dropDownResponse.vehicle_types[i].text, dropDownResponse.vehicle_types[i].value], (tx, result) => {
+                        if (result.rowsAffected > 0) {
+                            console.log("result:" + result.rowsAffected);
+                        }
+                    })
+
+                }
+                for (var i = 0; i < dropDownResponse.timezones.length; i++) {
+                    txn.executeSql("INSERT INTO device_type(type,text,value) VALUES (?,?,?)", ["timezones", dropDownResponse.timezones[i].text, dropDownResponse.timezones[i].value], (tx, result) => {
+                        if (result.rowsAffected > 0) {
+                            console.log("result:" + result.rowsAffected);
+                        }
+                    })
+
+                }
+                for (var i = 0; i < dropDownResponse.pollint_interval.length; i++) {
+                    txn.executeSql("INSERT INTO device_type(type,value) VALUES (?,?)", ["pollint_interval", dropDownResponse.pollint_interval[i]], (tx, result) => {
+                        if (result.rowsAffected > 0) {
+                            console.log("result:" + result.rowsAffected);
+                        }
+                    })
+                }
+                for (var i = 0; i < dropDownResponse.speed_limit.length; i++) {
+                    txn.executeSql("INSERT INTO device_type(type,value) VALUES (?,?)", ["speed_limit", dropDownResponse.speed_limit[i]], (tx, result) => {
                         if (result.rowsAffected > 0) {
                             console.log("result:" + result.rowsAffected);
                         }
