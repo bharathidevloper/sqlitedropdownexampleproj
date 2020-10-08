@@ -58,7 +58,6 @@ function TrackerAddingScreen(props) {
                         } else {
                             console.log(result.rows.item(0));
                             for (var i = 0; i < result.rows.length; i++) {
-                                console.log(result.rows.item(i).type);
 
                                 if (result.rows.item(i).type == "device_types") {
                                     deviceTypeJsonData.push({
@@ -166,6 +165,13 @@ function TrackerAddingScreen(props) {
 
     saveData = () => {
 
+
+        console.log("save clicked");
+        console.log(deviceType);
+        console.log(vehicleType);
+        console.log(pollingInterval);
+        console.log(speedLimit);
+        console.log(timeZone);
         console.log("save clicked");
         if (IMEI_STR === '') {
             ToastAndroid.show("Please enter last 6 digits of IMEI number", ToastAndroid.SHORT)
@@ -223,10 +229,14 @@ function TrackerAddingScreen(props) {
 
     _CallDriverType = (value) => {
         console.log(value)
+
         for (var i = 0; i < deviceTypeJsonData.length; i++) {
             if (value === deviceTypeJsonData[i].value) {
                 console.log(deviceTypeJsonData[i].text)
                 setDeviceType(deviceTypeJsonData[i].text)
+                console.log("deviceType");
+                console.log(deviceType);
+                console.log("deviceType");
             }
         }
     }
@@ -282,8 +292,6 @@ function TrackerAddingScreen(props) {
 
 
             //sqlite insert
-
-            console.log("cominggggg.....")
 
             db.transaction(txn => {
                 for (var i = 0; i < dropDownResponse.device_types.length; i++) {
@@ -381,6 +389,52 @@ function TrackerAddingScreen(props) {
 
         } else {
             console.log('Doesnot got dropDownResponse')
+            db.transaction((txn) => {
+                txn.executeSql(
+                    'SELECT type,text,value FROM device_type',
+                    [],
+                    (tx, result) => {
+                        console.log(result.rows.item(0));
+                        for (var i = 0; i < result.rows.length; i++) {
+
+                            if (result.rows.item(i).type == 'device_types') {
+                                deviceTypeJsonData.push({
+                                    value: result.rows.item(i).text,
+                                    text: result.rows.item(i).text,
+                                });
+                            }
+                            if (result.rows.item(i).type == 'vehicle_types') {
+                                vehicleTypeJsonData.push({
+                                    value: result.rows.item(i).text,
+                                    text: result.rows.item(i).text,
+                                });
+                            }
+                            if (result.rows.item(i).type == 'timezones') {
+                                timeZoneJsonData.push({
+                                    value: result.rows.item(i).text,
+                                    text: result.rows.item(i).text,
+                                });
+                            }
+                            if (result.rows.item(i).type == 'pollint_interval') {
+                                pollingIntervalJsonData.push({
+                                    value: result.rows.item(i).value,
+                                    text: result.rows.item(i).value,
+                                });
+                            }
+                            if (result.rows.item(i).type == 'speed_limit') {
+                                speedLimitJsonData.push({
+                                    value: result.rows.item(i).value,
+                                    text: result.rows.item(i).value,
+                                });
+
+                            }
+                        }
+                    },
+                );
+            });
+
+
+
         }
     } else {
         alert("please check your internet connection")
@@ -406,7 +460,7 @@ function TrackerAddingScreen(props) {
                     title=" Onboard"
                     actions={[{ title: 'Settings', icon: require('../assets/sync.png'), show: 'always', size: 20 }]}
                 /> */}
-                <TouchableOpacity onPress={this.goBack} >
+                <TouchableOpacity onPress={goBack} >
 
                     <View style={styles.toolbar}>
                         <Image
@@ -600,7 +654,7 @@ function TrackerAddingScreen(props) {
                                 <TouchableOpacity style={styles.buttonCnl}>
                                     <Text style={{ color: '#272626', fontFamily: 'montserrat_regular', fontSize: 17 }}>Cancel</Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={styles.button} onPress={this.saveData}>
+                                <TouchableOpacity style={styles.button} onPress={saveData}>
                                     <Text style={{ color: '#ffffff', fontFamily: 'montserrat_regular', fontSize: 17 }}>Save</Text>
                                 </TouchableOpacity>
                             </View>
